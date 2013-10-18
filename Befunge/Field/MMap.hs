@@ -1,4 +1,7 @@
-module Befunge.Field.MMap where
+module Befunge.Field.MMap (
+  MMapField,
+  newMMapField
+) where
 
 import Befunge.Field
 import Foreign

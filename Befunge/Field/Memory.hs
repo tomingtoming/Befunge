@@ -1,4 +1,7 @@
-module Befunge.Field.Memory where
+module Befunge.Field.Memory (
+  MemField,
+  newMemField
+) where
 
 import Befunge.Field
 import Foreign

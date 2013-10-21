@@ -1,7 +1,8 @@
 module Befunge.Stack (
   Stack(..),
   MemStack,
-  newMemStack
+  newMemStack,
+  newStackByPtr
 ) where
 
 import Foreign
@@ -36,7 +37,11 @@ instance Stack MemStack where
 
 newMemStack :: Int -> IO MemStack
 newMemStack size = do
-  s <- mallocArray ((sizeOf size) * 2 + size)
+  head <- mallocArray ((sizeOf size) * 2 + size) :: IO (Ptr Int)
+  newStackByPtr size head
+
+newStackByPtr size head = do
+  s <- return $ castPtr head
   p <- return $ plusPtr s (sizeOf size)
   a <- return $ plusPtr p (sizeOf size)
   poke s size

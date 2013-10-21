@@ -1,4 +1,4 @@
-module Befunge.Field.MMap (
+module Befunge.MMap.Field (
   MMapField,
   newMMapField
 ) where

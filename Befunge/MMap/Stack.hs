@@ -1,4 +1,7 @@
-module Befunge.Stack.MMap where
+module Befunge.MMap.Stack (
+  MMapStack,
+  newMMapStack
+) where
 
 import Befunge.Stack
 import Foreign

@@ -13,6 +13,13 @@ class Befunge b where
   getDirection :: b -> IO Word8
   setDirection :: b -> Word8 -> IO ()
 
+move :: Befunge b => b -> IO ()
+move bf = do
+  d <- getDirection bf
+  if mod d 2 == 1
+  then getX bf >>= \x -> setX bf $ x + 2 - (fromIntegral d)
+  else getY bf >>= \y -> setY bf $ y - 1 + (fromIntegral d)
+
 steps :: (Befunge b, Field f) => b -> f -> IO ()
 steps bf f = do
   alive <- step bf f

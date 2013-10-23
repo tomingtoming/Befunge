@@ -112,13 +112,6 @@ instructions = Map.fromList $
   , (c2w 'p', \(MMapBefunge _ _ _ s) f -> pop s >>= \y -> pop s >>= \x -> pop s >>= \v -> put (fromIntegral x) (fromIntegral y) f v >> return True)
   ]
 
-move :: MMapBefunge -> IO ()
-move (MMapBefunge x y d _) = do
-  d' <- peek d
-  if mod d' 2 == 1
-  then peek x >>= \x' -> poke x $ x' + 2 - (fromIntegral d')
-  else peek y >>= \y' -> poke y $ y' - 1 + (fromIntegral d')
-
 literals :: Field f => MMapBefunge -> f -> IO Bool
 literals bf field = do
   move bf

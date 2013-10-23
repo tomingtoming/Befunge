@@ -1,6 +1,7 @@
 module Befunge.MMap.Field (
   MMapField,
-  newMMapField
+  newMMapField,
+  restoreMMapField
 ) where
 
 import Befunge.Field
@@ -40,4 +41,15 @@ newMMapField w' h' path = do
   a <- return $ plusPtr h (sizeOf h')
   poke w w'
   poke h h'
+  return $ MMapField { setWidth  = w, setHeight = h, setArray  = a }
+
+restoreMMapField path = do
+  (p,rawSize,_,_) <- mmapFilePtr path ReadWrite Nothing
+  w <- return $ castPtr p
+  h <- return $ plusPtr w (sizeOf (0::Int))
+  a <- return $ plusPtr h (sizeOf (0::Int))
+  w' <- peek w
+  h' <- peek h
+  let size = (sizeOf w') + (sizeOf h') + (w' * h')
+  _ <- if rawSize == size then return () else error "MMap Fail"
   return $ MMapField { setWidth  = w, setHeight = h, setArray  = a }

@@ -61,12 +61,6 @@ newMMapBefunge x' y' d' l path = do
   poke d d'
   return $ MMapBefunge { xPtr = x, yPtr = y, dPtr = d, setStack = s }
 
-c2w :: Char -> Word8
-c2w = fromIntegral . ord
-
-w2c :: Word8 -> Char
-w2c = chr . fromIntegral
-
 instructions :: Field f => Map.Map Word8 (MMapBefunge -> f -> IO Bool)
 instructions = Map.fromList $
   [ (c2w '#', \bf _                    -> move bf >> return True)
@@ -115,13 +109,3 @@ instructions = Map.fromList $
   , (c2w 'g', \(MMapBefunge _ _ _ s) f -> pop s >>= \y -> pop s >>= \x -> get (fromIntegral x) (fromIntegral y) f >>= \v -> push s v >> return True)
   , (c2w 'p', \(MMapBefunge _ _ _ s) f -> pop s >>= \y -> pop s >>= \x -> pop s >>= \v -> put (fromIntegral x) (fromIntegral y) f v >> return True)
   ]
-
-literals :: Field f => MMapBefunge -> f -> IO Bool
-literals bf field = do
-  move bf
-  x <- getX bf
-  y <- getY bf
-  w <- get x y field
-  if w == c2w '"'
-  then return True
-  else push (setStack bf) w >> literals bf field

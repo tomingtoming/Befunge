@@ -2,6 +2,7 @@ module Befunge where
 
 import Befunge.Field
 import Befunge.Stack
+import Data.Char (chr, ord)
 import Foreign
 
 class Befunge b where
@@ -15,6 +16,12 @@ class Befunge b where
   popStack     :: b -> IO Word8
   pushStack    :: b -> Word8 -> IO ()
 
+c2w :: Char -> Word8
+c2w = fromIntegral . ord
+
+w2c :: Word8 -> Char
+w2c = chr . fromIntegral
+
 move :: Befunge b => b -> IO ()
 move bf = do
   d <- getDirection bf
@@ -27,3 +34,13 @@ steps bf f = do
   alive <- step bf f
   if alive then steps bf f
            else return ()
+
+literals :: (Befunge b, Field f) => b -> f -> IO Bool
+literals bf field = do
+  move bf
+  x <- getX bf
+  y <- getY bf
+  w <- get x y field
+  if w == c2w '"'
+  then return True
+  else pushStack bf w >> literals bf field

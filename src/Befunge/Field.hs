@@ -32,10 +32,12 @@ instance Field MemField where
     h' <- peek h
     pokeElemOff a ((mod x w') + (mod y h') * w') n
 
+newMemField :: Int -> Int -> IO MemField
 newMemField w' h' = do
   p <- mallocArray ((sizeOf w') + (sizeOf h') + (w' * h')) :: IO (Ptr Int)
   newFieldByPtr w' h' p
 
+newFieldByPtr :: Int -> Int -> Ptr a -> IO MemField
 newFieldByPtr w' h' p = do
   w <- return $ castPtr p
   h <- return $ plusPtr w (sizeOf w')

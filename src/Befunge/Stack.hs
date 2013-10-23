@@ -37,11 +37,12 @@ instance Stack MemStack where
 
 newMemStack :: Int -> IO MemStack
 newMemStack size = do
-  head <- mallocArray ((sizeOf size) * 2 + size) :: IO (Ptr Int)
-  newStackByPtr size head
+  headPtr <- mallocArray ((sizeOf size) * 2 + size) :: IO (Ptr Int)
+  newStackByPtr size headPtr
 
-newStackByPtr size head = do
-  s <- return $ castPtr head
+newStackByPtr :: Int -> Ptr a -> IO MemStack
+newStackByPtr size headPtr = do
+  s <- return $ castPtr headPtr
   p <- return $ plusPtr s (sizeOf size)
   a <- return $ plusPtr p (sizeOf size)
   poke s size

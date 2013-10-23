@@ -19,7 +19,7 @@ data MMapField = MMapField {
 
 instance Field MMapField where
 
-  deleteField (MMapField w h a) = do
+  deleteField (MMapField w h _) = do
     w'   <- peek w
     h'   <- peek h
     size <- return $ (sizeOf w') + (sizeOf h') + (w' * h')
@@ -35,6 +35,7 @@ instance Field MMapField where
     h' <- peek h
     pokeElemOff a ((mod x w') + (mod y h') * w') n
 
+newMMapField :: Int -> Int -> FilePath -> IO MMapField
 newMMapField w' h' path = do
   let size = (sizeOf w') + (sizeOf h') + (w' * h')
   (p,rawSize,_,_) <- mmapFilePtr path ReadWriteEx $ Just (0,size)
@@ -46,6 +47,7 @@ newMMapField w' h' path = do
   poke h h'
   return $ MMapField { setWidth  = w, setHeight = h, setArray  = a }
 
+restoreMMapField :: FilePath -> IO MMapField
 restoreMMapField path = do
   (p,rawSize,_,_) <- mmapFilePtr path ReadWrite Nothing
   w <- return $ castPtr p
@@ -57,6 +59,7 @@ restoreMMapField path = do
   _ <- if rawSize == size then return () else error "MMap Fail"
   return $ MMapField { setWidth  = w, setHeight = h, setArray  = a }
 
+srcMMapField :: FilePath -> FilePath -> IO MMapField
 srcMMapField src path = do
   ls <- fmap C8.lines $ C8.readFile src
   let

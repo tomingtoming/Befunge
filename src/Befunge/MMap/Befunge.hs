@@ -15,7 +15,7 @@ import System.Random (randomIO)
 data MMapBefunge = MMapBefunge {
   xPtr         :: Ptr Int,
   yPtr         :: Ptr Int,
-  setDirection :: Ptr Word8,
+  dPtr         :: Ptr Word8,
   setStack     :: MemStack
 }
 
@@ -39,6 +39,10 @@ instance Befunge MMapBefunge where
 
   setY (MMapBefunge _ y _ _) n = poke y n
 
+  getDirection (MMapBefunge _ _ d _)   = peek d
+
+  setDirection (MMapBefunge _ _ d _) n = poke d n
+
 newMMapBefunge :: Int -> Int -> Word8 -> Int -> FilePath -> IO MMapBefunge
 newMMapBefunge x' y' d' l path = do
   let size = (sizeOf x') + (sizeOf y') + (sizeOf d') + l
@@ -51,7 +55,7 @@ newMMapBefunge x' y' d' l path = do
   poke x x'
   poke y y'
   poke d d'
-  return $ MMapBefunge { xPtr = x, yPtr = y, setDirection = d, setStack = s }
+  return $ MMapBefunge { xPtr = x, yPtr = y, dPtr = d, setStack = s }
 
 c2w :: Char -> Word8
 c2w = fromIntegral . ord

@@ -13,8 +13,8 @@ import System.IO.MMap
 import System.Random (randomIO)
 
 data MMapBefunge = MMapBefunge {
-  setX         :: Ptr Int,
-  setY         :: Ptr Int,
+  xPtr         :: Ptr Int,
+  yPtr         :: Ptr Int,
   setDirection :: Ptr Word8,
   setStack     :: MemStack
 }
@@ -31,9 +31,13 @@ instance Befunge MMapBefunge where
     move bf
     return alive
 
-  getX (MMapBefunge x _ _ _) = peek x
+  getX (MMapBefunge x _ _ _)   = peek x
 
-  getY (MMapBefunge _ y _ _) = peek y
+  setX (MMapBefunge x _ _ _) n = poke x n
+
+  getY (MMapBefunge _ y _ _)   = peek y
+
+  setY (MMapBefunge _ y _ _) n = poke y n
 
 newMMapBefunge :: Int -> Int -> Word8 -> Int -> FilePath -> IO MMapBefunge
 newMMapBefunge x' y' d' l path = do
@@ -47,7 +51,7 @@ newMMapBefunge x' y' d' l path = do
   poke x x'
   poke y y'
   poke d d'
-  return $ MMapBefunge { setX = x, setY = y, setDirection = d, setStack = s }
+  return $ MMapBefunge { xPtr = x, yPtr = y, setDirection = d, setStack = s }
 
 c2w :: Char -> Word8
 c2w = fromIntegral . ord

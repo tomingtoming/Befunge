@@ -43,6 +43,10 @@ instance Befunge MMapBefunge where
 
   setDirection (MMapBefunge _ _ d _) n = poke d n
 
+  popStack (MMapBefunge _ _ _ s)    = pop s
+
+  pushStack (MMapBefunge _ _ _ s) n = push s n
+
 newMMapBefunge :: Int -> Int -> Word8 -> Int -> FilePath -> IO MMapBefunge
 newMMapBefunge x' y' d' l path = do
   let size = (sizeOf x') + (sizeOf y') + (sizeOf d') + l

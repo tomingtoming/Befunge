@@ -12,6 +12,8 @@ class Befunge b where
   setY         :: b -> Int -> IO ()
   getDirection :: b -> IO Word8
   setDirection :: b -> Word8 -> IO ()
+  popStack     :: b -> IO Word8
+  pushStack    :: b -> Word8 -> IO ()
 
 move :: Befunge b => b -> IO ()
 move bf = do

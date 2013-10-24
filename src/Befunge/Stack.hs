@@ -11,6 +11,7 @@ class Stack s where
   deleteStack :: s -> IO ()
   pop         :: s -> IO Word8
   push        :: s -> Word8 -> IO ()
+  depth       :: s -> IO Int
 
 data MemStack = MemStack {
   setSize    :: Ptr Int,
@@ -34,6 +35,8 @@ instance Stack MemStack where
     if p' < s'
     then poke p (p'+1) >> pokeElemOff a (fromIntegral p') n
     else error "stack overflow"
+
+  depth (MemStack s _ _) = peek s
 
 newMemStack :: Int -> IO MemStack
 newMemStack size = do

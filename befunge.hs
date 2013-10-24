@@ -1,4 +1,5 @@
 import Befunge
+import Befunge.ForkJoin
 import Befunge.MMap.Befunge
 import Befunge.MMap.Field
 import System.Environment
@@ -6,6 +7,8 @@ import System.Environment
 main :: IO ()
 main = do
   (src:_) <- getArgs
-  b <- newMMapBefunge 0 0 1 1024 "befunge.befunge"
+  fs <- newForkSet
+  b <- newMMapBefunge 0 0 1 1024 "befunge.befunge" fs
   f <- srcMMapField src "befunge.field"
-  steps b f
+  fire b f
+  joinAllWith fs

@@ -1,12 +1,15 @@
 module Befunge where
 
 import Befunge.Field
+import Control.Monad (liftM2)
 import Data.Char (chr, ord)
 import qualified Data.Map as Map
 import Foreign
 import System.Random (randomIO)
 
 class Befunge b where
+  fire         :: Field f => b -> f -> IO ()
+  spawn        :: Int -> Int -> Word8 -> b -> IO b
   getX         :: b -> IO Int
   setX         :: b -> Int -> IO ()
   getY         :: b -> IO Int
@@ -15,6 +18,7 @@ class Befunge b where
   setDirection :: b -> Word8 -> IO ()
   popStack     :: b -> IO Word8
   pushStack    :: b -> Word8 -> IO ()
+  delBefunge   :: b -> IO ()
 
 c2w :: Char -> Word8
 c2w = fromIntegral . ord
@@ -101,6 +105,9 @@ instructions = Map.fromList $
   , (c2w '$', \bf _ -> popStack bf >> return True)
 
   {- Memory Instructions -}
-  , (c2w 'g', \bf f -> popStack bf >>= \y -> popStack bf >>= \x -> get (fromIntegral x) (fromIntegral y) f >>= \v -> pushStack bf v >> return True)
-  , (c2w 'p', \bf f -> popStack bf >>= \y -> popStack bf >>= \x -> popStack bf >>= \v -> put (fromIntegral x) (fromIntegral y) f v >> return True)
+  , (c2w 'g', \bf f -> liftM2 (+) (getY bf) (fmap fromIntegral $ popStack bf) >>= \y -> liftM2 (+) (getX bf) (fmap fromIntegral $ popStack bf) >>= \x -> get x y f >>= \v -> pushStack bf v >> return True)
+  , (c2w 'p', \bf f -> liftM2 (+) (getY bf) (fmap fromIntegral $ popStack bf) >>= \y -> liftM2 (+) (getX bf) (fmap fromIntegral $ popStack bf) >>= \x -> popStack bf >>= \v -> put x y f v >> return True)
+
+  {- Thread Instructions -}
+  , (c2w 'w', \bf f -> liftM2 (+) (getY bf) (fmap fromIntegral $ popStack bf) >>= \y -> liftM2 (+) (getX bf) (fmap fromIntegral $ popStack bf) >>= \x -> popStack bf >>= \d -> spawn x y d bf >>= \bf' -> fire bf' f >> return True)
   ]

@@ -32,6 +32,8 @@ instance Stack MMapStack where
     then poke p (p'+1) >> pokeElemOff a (fromIntegral p') n
     else error "stack overflow"
 
+  depth (MMapStack s _ _) = peek s
+
 newMMapStack :: Int -> FilePath -> IO MMapStack
 newMMapStack h path = do
   let size = (sizeOf h) * 2 + h
